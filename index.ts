@@ -2,6 +2,7 @@ class Perfil{
     private _idPerfil: number;
     private _nome: string;
     private _email: string;
+    private _postagensDoPerfil: Postagem[] = []; // alterar para _postagens (?)
     constructor(i:number, n:string, e:string){
         this._idPerfil = i;
         this._nome = n;
@@ -18,6 +19,10 @@ class Perfil{
 
     get email(): string{
         return this._email;
+    }
+
+    get postagensDoPerfil(): Postagem[] {
+        return this._postagensDoPerfil;
     }
 }
 
@@ -75,68 +80,100 @@ class Postagem{
 }
 
 class PostagemAvancada extends Postagem{
-    private _hashtags: string[];
+    private _hashtags: string[] = [];
     private _visualizacoesRestantes: number = 1000;
     constructor(i:number, t:string, c:number, d:number, dt:Date, p:Perfil){
         super(i, t, c, d, dt, p);
     }
 
-    adicionarHashtag(hashtag:string): void{
-        this._hashtags.push(hashtag);
+    get hashtags(): string[] {
+        return this._hashtags;
     }
 
-    //existeHashtag(hashtag:string): boolean{    }
+    get visualizacoesRestantes(): number {
+        return this._visualizacoesRestantes;
+    }
+
+    /*set visualizacoesRestantes(visualRestantes: number) {
+        this._visualizacoesRestantes = visualRestantes;
+    }*/
+
+    adicionarHashtag(hashtag:string): void{
+        this.hashtags.push(hashtag);
+    }
+
+    existeHashtag(hashtag:string): boolean {
+        let temHashtag = false;
+        for(let h of this._hashtags){
+            if(h == hashtag){
+                temHashtag = true;
+                break;
+            }
+        }
+        return temHashtag;
+    }
+
+    decrementarVisualizacoes(): void {  // adicionar excessao (?)
+        if (this._visualizacoesRestantes > 0) {
+            this._visualizacoesRestantes--;
+        }
+    }
+
+    quantidadeDeVizualizaoes(): number{ // é necessario ?
+        return 1000 - this.visualizacoesRestantes;
+    }
 }
+
 
 class RepositorioDePerfis{
     private _perfis: Perfil[]=[];
 
-    consultarPerf(id?: number, nome?: string, email?: string): Perfil {  // ver dps
+    consultarPerfil(id: number, nome?: string, email?: string):Perfil{
         let perfilProcurado!: Perfil;
         for (let p of this._perfis){
-            if(p.idPerfil == id || p.nome == nome || p.email == email){
+            if((p.idPerfil == id) || 
+            (p.nome == nome) || 
+            (p.email == email)){
                 perfilProcurado = p;
                 break;
             }
-            
         }
         return perfilProcurado;
     }
 
     incluir(perfil: Perfil): void {
-        if(!this.consultarPerf(perfil.idPerfil)){
+        if(!this.consultarPerfil(perfil.idPerfil, perfil.nome, perfil.email)){ // pode consultar por: id; id, nome; id, nome, email
             this._perfis.push(perfil);
         }
     }
 }
 
+class RepositorioPostagens{
+    _postagens: Postagem[] = [];
 
-class RepositorioPOstagens{
-    private _postagens: Postagem[] = [];
-
-    consultarPost(id: number, texto:  string, hashtag: string, perfil: Perfil): Postagem[]{
-        let postagemProcurada!: Postagem;
-        for(let postagem of this._postagens){
-            
+    consultarPostagem(id?: number, texto?: string, hashtag?: string, perfil?: Perfil): Postagem[] {
+        const postagemProcurada: Postagem[] = [];
+    
+        for (let postagem of this._postagens) {
+            if((id === undefined || postagem.idPostagem === id) &&
+                (texto === undefined || postagem.texto === texto) &&
+                (!hashtag || (postagem instanceof PostagemAvancada && postagem.existeHashtag(hashtag))) &&
+                (perfil === undefined || postagem.perfil === perfil)
+            ) {
+                postagemProcurada.push(postagem);
+            }
         }
+    
+        return postagemProcurada;
+    }
+    
+    incluir(postagem: Postagem): void {
+        if(!this.consultarPostagem(postagem.idPostagem)){
+            this._postagens.push(postagem);    
+        }
+
+        /*if(postagem.perfil){ //incompleto
+            postagem.perfil.postagensDoPerfil
+        }*/
     }
 }
-
-
-let perfil1: Perfil = new Perfil(1, 'alessandra', 'ale@gmail.com')
-let postagem1: Postagem = new Postagem(1, 'texto', 8, 5, new Date(), perfil1)
-postagem1.descurtir()
-
-let perfil2: Perfil = new Perfil(2, 'kaylanne', 'kayms@gmail.com')
-let perfil3: Perfil = new Perfil(3, 'kaylanne', 'k@gmail.com')
-
-let rp: RepositorioDePerfis = new RepositorioDePerfis();
-rp.incluir(perfil1);
-rp.incluir(perfil2);
-rp.incluir(perfil3);
-console.log(rp.perfis);
-
-
-
-
-//console.log(postagem1.ehPopular());
