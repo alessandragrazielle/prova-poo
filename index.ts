@@ -148,32 +148,34 @@ class RepositorioDePerfis{
     }
 }
 
-class RepositorioPostagens{
-    _postagens: Postagem[] = [];
 
-    consultarPostagem(id?: number, texto?: string, hashtag?: string, perfil?: Perfil): Postagem[] {
-        const postagemProcurada: Postagem[] = [];
-    
-        for (let postagem of this._postagens) {
-            if((id === undefined || postagem.idPostagem === id) &&
-                (texto === undefined || postagem.texto === texto) &&
-                (!hashtag || (postagem instanceof PostagemAvancada && postagem.existeHashtag(hashtag))) &&
-                (perfil === undefined || postagem.perfil === perfil)
-            ) {
-                postagemProcurada.push(postagem);
-            }
-        }
-    
-        return postagemProcurada;
-    }
-    
-    incluir(postagem: Postagem): void {
-        if(!this.consultarPostagem(postagem.idPostagem)){
-            this._postagens.push(postagem);    
-        }
+class RepositorioPostagens {
+  private _postagens: Postagem[] = [];
 
-        /*if(postagem.perfil){ //incompleto
-            postagem.perfil.postagensDoPerfil
-        }*/
+
+  consultarPostagem(id?: number, texto?: string, hashtag?: string, perfil?: Perfil): Postagem[] {
+    let postagensFiltradas = this._postagens;
+
+    if (id !== undefined) {
+      postagensFiltradas = postagensFiltradas.filter((p) => p.idPostagem === id);
     }
+    if (texto !== undefined) {
+      postagensFiltradas = postagensFiltradas.filter((p) => p.texto === texto);
+    }
+    if (hashtag !== undefined) {
+      postagensFiltradas = postagensFiltradas.filter(
+        (p) => p instanceof PostagemAvancada && (p as PostagemAvancada).existeHashtag(hashtag)
+      );
+    }
+    if (perfil !== undefined) {
+      postagensFiltradas = postagensFiltradas.filter((p) => p.perfil === perfil);
+    }
+
+    return postagensFiltradas;
+  }
+
+  incluir(postagem: Postagem): void {
+    this._postagens.push(postagem);
+    postagem.perfil.postagensDoPerfil.push(postagem);
+  }
 }
