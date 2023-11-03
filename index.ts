@@ -5,7 +5,7 @@ class Perfil{
     private _postagensDoPerfil: Postagem[] = []; // alterar para _postagens (?)
     constructor(i:number, n:string, e:string){
         this._idPerfil = i;
-        this._nome = n;
+        this._nome = n.trim();
         this._email = e;
     }
 
@@ -29,16 +29,16 @@ class Perfil{
 class Postagem{
     private _idPostagem: number;
     private _texto: string;
-    private _curtidas: number;
-    private _descurtidas: number;
-    private _data: Date;
+    private _curtidas: number = 0;
+    private _descurtidas: number = 0;
+    private _data: Date = new Date();
     private _perfil: Perfil;
-    constructor(i:number, t:string, c:number, d:number, dt:Date, p:Perfil){
+    constructor(i:number, t:string, /*c:number, d:number, dt:Date,*/ p:Perfil){
         this._idPostagem = i;
         this._texto = t;
-        this._curtidas = c;
-        this._descurtidas = d;
-        this._data = dt;
+        //this._curtidas = c;
+        //this._descurtidas = d;
+        //this._data = dt;
         this._perfil = p;
     }
 
@@ -83,7 +83,7 @@ class PostagemAvancada extends Postagem{
     private _hashtags: string[] = [];
     private _visualizacoesRestantes: number = 1000;
     constructor(i:number, t:string, c:number, d:number, dt:Date, p:Perfil){
-        super(i, t, c, d, dt, p);
+        super(i, t, /*c, d, dt,*/ p);
     }
 
     get hashtags(): string[] {
@@ -128,12 +128,12 @@ class PostagemAvancada extends Postagem{
 class RepositorioDePerfis{
     private _perfis: Perfil[]=[];
 
-    consultarPerfil(id: number, nome?: string, email?: string):Perfil{
+    consultarPerfil(id?: number, nome?: string, email?: string): Perfil {
         let perfilProcurado!: Perfil;
         for (let p of this._perfis){
-            if((p.idPerfil == id) || 
-            (p.nome == nome) || 
-            (p.email == email)){
+            if((id == undefined || p.idPerfil == id) &&
+            (nome == undefined || p.nome == nome) &&
+            (email == undefined || p.email == email)){
                 perfilProcurado = p;
                 break;
             }
@@ -141,7 +141,7 @@ class RepositorioDePerfis{
         return perfilProcurado;
     }
 
-    incluir(perfil: Perfil): void {
+    incluirPerfil(perfil: Perfil): void {
         if(!this.consultarPerfil(perfil.idPerfil, perfil.nome, perfil.email)){ // pode consultar por: id; id, nome; id, nome, email
             this._perfis.push(perfil);
         }
@@ -149,11 +149,10 @@ class RepositorioDePerfis{
 }
 
 
-class RepositorioPostagens {
-  private _postagens: Postagem[] = [];
+class RepositorioDePostagens {
+    private _postagens: Postagem[] = [];
 
-
-  consultarPostagem(id?: number, texto?: string, hashtag?: string, perfil?: Perfil): Postagem[] {
+    consultarPostagem(id?: number, texto?: string, hashtag?: string, perfil?: Perfil): Postagem[] {
         let postagensFiltradas: Postagem[] = [];
     
         for (let p of this._postagens) {
@@ -170,9 +169,13 @@ class RepositorioPostagens {
     
         return postagensFiltradas;
     }
+    
 
-  incluir(postagem: Postagem): void {
-    this._postagens.push(postagem);
-    postagem.perfil.postagensDoPerfil.push(postagem);
-  }
+    incluirPostagem(postagem: Postagem): void {
+        this._postagens.push(postagem);
+        postagem.perfil.postagensDoPerfil.push(postagem);
+    }
 }
+
+
+export { Perfil, Postagem, PostagemAvancada, RepositorioDePerfis, RepositorioDePostagens }
