@@ -154,25 +154,22 @@ class RepositorioPostagens {
 
 
   consultarPostagem(id?: number, texto?: string, hashtag?: string, perfil?: Perfil): Postagem[] {
-    let postagensFiltradas = this._postagens;
-
-    if (id !== undefined) {
-      postagensFiltradas = postagensFiltradas.filter((p) => p.idPostagem === id);
+        let postagensFiltradas: Postagem[] = [];
+    
+        for (let p of this._postagens) {
+            if ((id == undefined || p.idPostagem == id) &&
+                (texto == undefined || p.texto == texto) &&
+                (perfil == undefined || p.perfil == perfil)) {
+                if (hashtag !== undefined && p instanceof PostagemAvancada && (p as PostagemAvancada).existeHashtag(hashtag)) {
+                    postagensFiltradas.push(p);
+                } else if (hashtag == undefined) {
+                    postagensFiltradas.push(p);
+                }
+            }
+        }
+    
+        return postagensFiltradas;
     }
-    if (texto !== undefined) {
-      postagensFiltradas = postagensFiltradas.filter((p) => p.texto === texto);
-    }
-    if (hashtag !== undefined) {
-      postagensFiltradas = postagensFiltradas.filter(
-        (p) => p instanceof PostagemAvancada && (p as PostagemAvancada).existeHashtag(hashtag)
-      );
-    }
-    if (perfil !== undefined) {
-      postagensFiltradas = postagensFiltradas.filter((p) => p.perfil === perfil);
-    }
-
-    return postagensFiltradas;
-  }
 
   incluir(postagem: Postagem): void {
     this._postagens.push(postagem);
