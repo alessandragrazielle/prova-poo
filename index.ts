@@ -123,42 +123,42 @@ class PostagemAvancada extends Postagem{
         return 1000 - this.visualizacoesRestantes;
     }
 }
+class RepositorioDePerfis {
+    private _perfis: Perfil[] = [];
 
+    consultarPerfil(id?: number, nome?: string, email?: string): Perfil | string{
+        let perfilProcurado!: Perfil | string;
 
-class RepositorioDePerfis{
-    private _perfis: Perfil[]=[];
-
-    consultarPerfil(id?: number, nome?: string, email?: string): Perfil | string {
-        let perfilProcurado!: Perfil | null;
-        for (let p of this._perfis){
+        for(let p of this._perfis){
             if((id == undefined || p.idPerfil == id) &&
-            (nome == undefined || p.nome == nome) &&
-            (email == undefined || p.email == email)){
-                perfilProcurado = p;
-                break;
+                (nome == undefined || p.nome == nome) && 
+                (email == undefined || p.email == email)){
+                    perfilProcurado = p
             }
-        }
-
-        if(perfilProcurado === null){
-            return 'Perfil nao encontrado'
         }
 
         return perfilProcurado;
     }
 
-    incluirPerfil(perfil: Perfil) : string {
-        if(perfil.idPerfil && perfil.nome && perfil.email){
-            if(this.consultarPerfil(perfil.idPerfil, perfil.nome, perfil.email)){ 
-                return 'Perfil já existente!';
+    incluirPerfil(perfil: Perfil){
+        if(perfil.idPerfil && 
+            perfil.nome && 
+            perfil.email){
+            //let perfilExiste = this._perfis.find(p => p.idPerfil == perfil.idPerfil);
+            let perfilExiste = this.consultarPerfil(perfil.idPerfil, perfil.nome, perfil.email)
+
+            if(perfilExiste){ 
+                return 'Perfil já existente!';                
             } 
         } else {
             return 'Todos os atributos devem estar preenchidos!';
         }
 
         this._perfis.push(perfil);
-        return 'Perfil incluído com sucesso!';        
+        return 'Perfil incluído com sucesso!'; 
     }
 }
+
 
 
 class RepositorioDePostagens {
@@ -190,10 +190,10 @@ class RepositorioDePostagens {
         if (postagem.idPostagem &&   // mudar isso
             postagem.texto.trim() &&
             postagem.perfil) {
-            //let postagemExiste = this.consultarPostagem(postagem.idPostagem);
-            let postagemExiste = this._postagens.find(p => p.idPostagem === postagem.idPostagem); // colocar isso no consultar
+            let postagemExiste = this.consultarPostagem(postagem.idPostagem);
+            //let postagemExiste = this._postagens.find(p => p.idPostagem === postagem.idPostagem); // colocar isso no consultar
     
-            if (postagemExiste) {
+            if (postagemExiste.length == 1) {
                 return 'Já existe uma postagem com o mesmo ID!';
             } 
         } else {
@@ -208,3 +208,73 @@ class RepositorioDePostagens {
 
 
 export { Perfil, Postagem, PostagemAvancada, RepositorioDePerfis, RepositorioDePostagens }
+
+
+
+// instanciando
+//Perfis
+let perfil1: Perfil = new Perfil(1, 'alessandra', 'ale@gmail.com')
+let perfil2: Perfil = new Perfil(2, 'kaylanne', 'k@gmail.com')
+let perfil3: Perfil = new Perfil(3, 'kaylanne santos', 'k@gmail.com') // n inclui
+let perfil4: Perfil = new Perfil(3, 'kaylanne santossss', 'kay@gmail.com') 
+let perfil5: Perfil = new Perfil(4, 'maria', 'm@gmail.com')
+
+// Repositorio de perfis
+let rperfil: RepositorioDePerfis = new RepositorioDePerfis();
+rperfil.incluirPerfil(perfil1);
+rperfil.incluirPerfil(perfil2);
+rperfil.incluirPerfil(perfil3);
+rperfil.incluirPerfil(perfil4);
+rperfil.incluirPerfil(perfil5);
+
+console.log('------------------------------------------------------');
+console.log('PERFIS NO REPOSITORIO');
+console.log(rperfil);
+
+
+//console.log(rperfil.consultarPerfil(undefined,'maria',undefined));
+
+//Postagens
+let postagem1: Postagem = new Postagem(1, 'texto', perfil1);
+let postagem2: Postagem = new Postagem(2, 'textoo', perfil2);
+let postagem3: Postagem = new Postagem(3, 'textoooo',  perfil3);
+let postagem4: Postagem = new Postagem(4, 'textoooo', perfil4);
+
+//Postagens Avancadas
+let postagemA1: PostagemAvancada = new PostagemAvancada(1, 'texto', 8, 5, new Date(), perfil1);
+let postagemA2: PostagemAvancada = new PostagemAvancada(2, 'textoo', 7, 4, new Date(), perfil2);
+
+// Adicionando hashtags
+postagemA1.adicionarHashtag('#instagram')
+postagemA1.adicionarHashtag('#post')
+postagemA2.adicionarHashtag('#post')
+postagemA2.adicionarHashtag('#vida')
+
+console.log('------------------------------------------------------');
+console.log('HASHTAGS');
+console.log(postagemA1.hashtags);
+console.log(postagemA2.hashtags);
+
+console.log('------------------------------------------------------');
+console.log('TEM HASHTAG?');
+console.log(postagemA1.existeHashtag('#post'));
+console.log(postagemA2.existeHashtag('#post'));
+console.log(postagemA1.existeHashtag('#vida'));
+console.log(postagemA2.existeHashtag('#vida'));
+
+//console.log(rpostagem.consultarPostagem(undefined,undefined,undefined,perfil4));
+
+console.log('------------------------------------------------------');
+let rpostagem: RepositorioDePostagens = new RepositorioDePostagens();
+
+//console.log(rpostagem._postagens);
+rpostagem.incluirPostagem(postagem1)
+rpostagem.incluirPostagem(postagem2)
+rpostagem.incluirPostagem(postagem3)
+rpostagem.incluirPostagem(postagem4)
+rpostagem.incluirPostagem(postagemA1)
+rpostagem.incluirPostagem(postagemA2)
+console.log(rpostagem.consultarPostagem(undefined, undefined, '#post'))
+
+//postagem1.descurtir()
+//console.log(postagem1.ehPopular());
