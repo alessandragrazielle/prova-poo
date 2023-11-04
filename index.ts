@@ -166,8 +166,6 @@ class RepositorioDePerfis {
     }
 }
 
-
-
 class RepositorioDePostagens {
     private _postagens: Postagem[] = [];
 
@@ -194,7 +192,7 @@ class RepositorioDePostagens {
     }
 
     incluirPostagem(postagem: Postagem): string {
-        if (postagem.idPostagem &&   // mudar isso
+        if (postagem.idPostagem &&   
             postagem.texto.trim() &&
             postagem.perfil) {
             let postagemExiste = this.consultarPostagem(postagem.idPostagem);
@@ -206,7 +204,7 @@ class RepositorioDePostagens {
         } else {
             return 'Todos os atributos da postagem devem estar preenchidos!';
         }
-
+        
         this._postagens.push(postagem)
         postagem.perfil.postagensDoPerfil.push(postagem);
         return'Postagem incluída com sucesso!';
