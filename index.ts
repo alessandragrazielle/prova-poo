@@ -5,7 +5,7 @@ class Perfil{
     private _postagensDoPerfil: Postagem[] = []; // alterar para _postagens (?)
     constructor(i:number, n:string, e:string){
         this._idPerfil = i;
-        this._nome = n.trim();
+        this._nome = n;
         this._email = e;
     }
 
@@ -128,8 +128,8 @@ class PostagemAvancada extends Postagem{
 class RepositorioDePerfis{
     private _perfis: Perfil[]=[];
 
-    consultarPerfil(id?: number, nome?: string, email?: string): Perfil {
-        let perfilProcurado!: Perfil;
+    consultarPerfil(id?: number, nome?: string, email?: string): Perfil | string {
+        let perfilProcurado!: Perfil | null;
         for (let p of this._perfis){
             if((id == undefined || p.idPerfil == id) &&
             (nome == undefined || p.nome == nome) &&
@@ -138,13 +138,25 @@ class RepositorioDePerfis{
                 break;
             }
         }
+
+        if(perfilProcurado === null){
+            return 'Perfil nao encontrado'
+        }
+
         return perfilProcurado;
     }
 
-    incluirPerfil(perfil: Perfil): void {
-        if(!this.consultarPerfil(perfil.idPerfil, perfil.nome, perfil.email)){ // pode consultar por: id; id, nome; id, nome, email
-            this._perfis.push(perfil);
+    incluirPerfil(perfil: Perfil) : string {
+        if(perfil.idPerfil && perfil.nome && perfil.email){
+            if(this.consultarPerfil(perfil.idPerfil, perfil.nome, perfil.email)){ 
+                return 'Perfil já existente!';
+            } 
+        } else {
+            return 'Todos os atributos devem estar preenchidos!';
         }
+
+        this._perfis.push(perfil);
+        return 'Perfil incluído com sucesso!';        
     }
 }
 
@@ -152,7 +164,7 @@ class RepositorioDePerfis{
 class RepositorioDePostagens {
     private _postagens: Postagem[] = [];
 
-    consultarPostagem(id?: number, texto?: string, hashtag?: string, perfil?: Perfil): Postagem[] {
+    consultarPostagem(id?: number, texto?: string, hashtag?: string, perfil?: Perfil): Postagem[] | string {
         let postagensFiltradas: Postagem[] = [];
     
         for (let p of this._postagens) {
@@ -167,14 +179,31 @@ class RepositorioDePostagens {
             }
         }
     
+        if(postagensFiltradas.length == 0){
+            return 'Postagem não encontrada!'
+        }
+
         return postagensFiltradas;
     }
-    
 
-    incluirPostagem(postagem: Postagem): void {
-        this._postagens.push(postagem);
+    incluirPostagem(postagem: Postagem): string {
+        if (postagem.idPostagem &&   // mudar isso
+            postagem.texto.trim() &&
+            postagem.perfil) {
+            //let postagemExiste = this.consultarPostagem(postagem.idPostagem);
+            let postagemExiste = this._postagens.find(p => p.idPostagem === postagem.idPostagem); // colocar isso no consultar
+    
+            if (postagemExiste) {
+                return 'Já existe uma postagem com o mesmo ID!';
+            } 
+        } else {
+            return 'Todos os atributos da postagem devem estar preenchidos!';
+        }
+
+        this._postagens.push(postagem)
         postagem.perfil.postagensDoPerfil.push(postagem);
-    }
+        return'Postagem incluída com sucesso!';
+    }  
 }
 
 
