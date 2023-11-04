@@ -16,78 +16,22 @@ class RedeSocial {
         return this._repositorioDePostagens;
     }
 
-    incluirPerfil(perfil: Perfil): string {
-        let perfilProcurado!: Perfil | null;
-
-        if(perfil.idPerfil && perfil.nome && perfil.email){ //incluir perfil a partir do RepositorioDePerfis
-            perfilProcurado = this.repositorioDePerfis.consultarPerfil(perfil.idPerfil, perfil.nome, perfil.email);
-            if(!perfilProcurado){
-                this.repositorioDePerfis.incluirPerfil(perfil);
-                return 'Perfil incluído com sucesso!';
-            }
-            return 'Perfil já existente!';
-        }
-
-        return 'Todos os atributos devem estar preenchidos!';
+    incluirPerfil(perfil: Perfil): string | Perfil{  // com problema
+        return this.repositorioDePerfis.consultarPerfil(perfil.idPerfil, perfil.nome, perfil.email);
     }
 
     consultarPerfil(id?: number, nome?: string, email?: string): Perfil | string {  //consultar perfil a partir do RepositorioDePerfis
-        if (!(this.repositorioDePerfis.consultarPerfil(id, nome, email))){
-            return 'Perfil não encontrado!'
-        } 
-
         return this.repositorioDePerfis.consultarPerfil(id, nome, email);
     }
 
-    consultarPostagem(id: number, texto: string, hashtag: string | undefined, perfil:  Perfil){
-        if(!this.respositorioDePostagens.consultarPostagem(id, texto, hashtag, perfil)){
-            return 'Postagem não encontrada!'
-        }
-
-        return this.respositorioDePostagens.consultarPostagem(id, texto, hashtag, perfil);
+    consultarPostagem(id?: number | undefined, texto?: string | undefined, hashtag?: string | undefined, perfil?:  Perfil | undefined): Postagem[] | string {
+        return this._repositorioDePostagens.consultarPostagem(id, texto, hashtag, perfil);
     }
 
-    // modo 1
-    incluirPostagem(postagem: Postagem): string {
-        let postagemProcurada!: null;
-        
     
-        if (this.validaPostagem(postagem)) {
-            let postagemExiste = this._repositorioDePostagens.consultarPostagem(postagem.idPostagem);
-
-            if (postagemExiste !== null) {
-                return 'Já existe uma postagem com o mesmo ID!';
-            } else {
-                this._repositorioDePostagens.incluirPostagem(postagem);
-                return 'Post incluido!';
-            }
-        } else {
-            return 'Todos os atributos da postagem devem estar preenchidos!';
-        }
-    
+    incluirPostagem(postagem: Postagem): string{
+        return this._repositorioDePostagens.incluirPostagem(postagem);
     }
-
-    // modo 2
-    incluirPostagem2(postagem: Postagem): string {
-        let postagemProcurada!: Postagem | null;
-    
-        if (postagem.idPostagem && postagem.texto && postagem.perfil) {
-            postagemProcurada = this._repositorioDePostagens.consultarPostagem(postagem.idPostagem, postagem.texto, undefined, postagem.perfil);
-            if (!postagemProcurada) {
-                this._repositorioDePostagens.incluirPostagem(postagem);
-                return 'Postagem incluída com sucesso!';
-            }
-        }
-        return 'Todos os atributos devem estar preenchidos!';
-    }
-
-    private validaPostagem(postagem: Postagem): boolean {
-        return (
-            postagem.idPostagem != undefined && 
-            postagem.texto != undefined &&
-            postagem.perfil != undefined
-        );
-    }    
 }
 
 export{ RedeSocial };
