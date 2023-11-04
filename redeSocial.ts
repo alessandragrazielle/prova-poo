@@ -54,21 +54,31 @@ let postagem2: Postagem = new Postagem(2, 'segundo post do perfil', perfil2);
 let postagem3: Postagem = new Postagem(3, ' ', perfil4); // texto vazio
 let postagem4: Postagem = new Postagem(2, 'um post qualquer', perfil1); // id repitido
 let postagem5: Postagem = new Postagem(5, 'outro post', perfil1);
+let postagem6: PostagemAvancada = new PostagemAvancada(6, 'primeiro post avancado', perfil2);
+let postagem7: PostagemAvancada = new PostagemAvancada(7, 'outro post avancado', perfil1);
+
+// ADICIONANDO HASHTAG
+postagem6.adicionarHashtag('#primeiroPostAvancado');
+postagem6.adicionarHashtag('#maisUmaHashtag');
+postagem7.adicionarHashtag('#maisUmaHashtag');
+postagem6.adicionarHashtag('#vida');
+
 
 console.log('--------------------------------------------');
 console.log('INCLUIR PERFIS \n');
 console.log(rs.incluirPerfil(perfil1));
 console.log(rs.incluirPerfil(perfil2)); 
 console.log(rs.incluirPerfil(perfil3)); // o nome esta nulo
-console.log(rs.incluirPerfil(perfil4)); 
+console.log(rs.incluirPerfil(perfil4)); // email ja existe
 console.log(rs.incluirPerfil(perfil5)); // nome ja existe
-console.log(rs.incluirPerfil(perfil10));
+console.log(rs.incluirPerfil(perfil10)); // id ja existe
 
 console.log('--------------------------------------------');
 console.log('CONSULTAR PERFIL \n');
 console.log(rs.consultarPerfil(5)); // n encontrado
 console.log(rs.consultarPerfil(1));
-console.log(rs.consultarPerfil(undefined, 'kaylanne santos', 'ale@gmail.com')); // n encontrado
+console.log(`tipo: ${typeof(rs.consultarPerfil(undefined, 'kaylanne santos', 'ale@gmail.com'))}`)
+
 
 
 console.log('--------------------------------------------');
@@ -78,8 +88,11 @@ console.log(rs.incluirPostagem(postagem2));
 console.log(rs.incluirPostagem(postagem3)); // n inclui
 console.log(rs.incluirPostagem(postagem4)); // n inclui
 console.log(rs.incluirPostagem(postagem5)); 
+console.log(rs.incluirPostagem(postagem6));
+console.log(rs.incluirPostagem(postagem7));  
 
 console.log('--------------------------------------------');
 console.log('CONSULTAR POSTAGENS \n');
-console.log(rs.consultarPostagem(1, 'ok', undefined, perfil1));
-console.log(rs.consultarPostagem(8));
+//console.log(rs.consultarPostagem(1, 'ok', undefined, perfil1));
+//console.log(rs.consultarPostagem(8))
+console.log(rs.consultarPostagem(6));
