@@ -123,11 +123,12 @@ class PostagemAvancada extends Postagem{
         return 1000 - this.visualizacoesRestantes;
     }
 }
+
 class RepositorioDePerfis {
     private _perfis: Perfil[] = [];
 
-    consultarPerfil(id?: number, nome?: string, email?: string): Perfil | string{
-        let perfilProcurado!: Perfil | string;
+    consultarPerfil(id?: number, nome?: string, email?: string): Perfil{ // resolver o problema do undefined
+        let perfilProcurado!: Perfil;
 
         for(let p of this._perfis){
             if((id == undefined || p.idPerfil == id) &&
@@ -144,8 +145,14 @@ class RepositorioDePerfis {
         if(perfil.idPerfil && 
             perfil.nome && 
             perfil.email){
-            //let perfilExiste = this._perfis.find(p => p.idPerfil == perfil.idPerfil);
-            let perfilExiste = this.consultarPerfil(perfil.idPerfil, perfil.nome, perfil.email)
+            let perfilExiste = this._perfis.find(
+                p =>
+                    (p.idPerfil === perfil.idPerfil) ||
+                    (p.nome === perfil.nome) ||
+                    (p.email === perfil.email)
+            )
+
+            //let perfilExiste = this.consultarPerfil(perfil.idPerfil, perfil.nome, perfil.email)
 
             if(perfilExiste){ 
                 return 'Perfil já existente!';                
