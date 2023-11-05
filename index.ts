@@ -201,6 +201,15 @@ class RepositorioDePerfis {
 
         return perfis;
     }
+    
+    exibirPerfil(idPerfil: number){ // criado exibição por perfil
+        let perfilProcurado = this.consultarPerfil(idPerfil);
+
+        if(perfilProcurado.idPerfil == idPerfil){
+            return `Id: ${perfilProcurado.idPerfil},\nUsuário: ${perfilProcurado.nome},\nEmail: ${perfilProcurado.email}.`;
+        }
+    }
+
 }
 
 class RepositorioDePostagens {
@@ -296,17 +305,70 @@ class RepositorioDePostagens {
         let postagens: string = '';
 
         for(let p of this._postagens){
-            postagens += `
-            Id: ${p.idPostagem}
-            Texto: ${p.texto}
-            Curtidas: ${p.curtidas}
-            Descurtidas: ${p.descurtidas}
-            `
+            if(p instanceof PostagemAvancada){
+                postagens += `
+                Id: ${p.idPostagem}
+                Texto: ${p.texto}
+                Curtidas: ${p.curtidas}
+                Descurtidas: ${p.descurtidas}
+                Hashtags: ${p.hashtags}
+                Vizualizações: ${p.quantidadeDeVizualizaoes()}
+                `
+                if (p.visualizacoesRestantes > 0){
+                    p.decrementarVisualizacoes();
+                }
+            } else {
+                postagens += `
+                Id: ${p.idPostagem}
+                Texto: ${p.texto}
+                Curtidas: ${p.curtidas}
+                Descurtidas: ${p.descurtidas}
+                `
+            }
         }
 
         return postagens;
     }
-}
 
+    exibirPostagensPorHashtag(hashtag: string): PostagemAvancada[] {
+        let postagensFiltradas: PostagemAvancada [] = [];
+        
+        let result = this.consultarPostagem(undefined, undefined, hashtag, undefined);//como instanciar ????????
+
+        if (typeof result === 'string') {
+            console.log(result);
+            return postagensFiltradas;
+        }
+
+        for(let postagem of result){
+            if (postagem instanceof PostagemAvancada && postagem.existeHashtag(hashtag)){
+                if (postagem.visualizacoesRestantes > 0){
+                    postagensFiltradas.push(postagem);
+                    postagem.decrementarVisualizacoes();
+                }
+            }
+        }
+        return postagensFiltradas;
+    }
+
+
+    exibirPorPostagem(idPostagem?: number, texto?: string){ // criada exibição por postagem
+        let postagemProcurada = this.consultarPostagem(idPostagem);
+        if(postagemProcurada instanceof PostagemAvancada){
+            if (postagemProcurada.visualizacoesRestantes > 0){
+                postagemProcurada.decrementarVisualizacoes();
+            }
+        }
+
+        if(idPostagem != undefined){
+            return this.consultarPostagem(idPostagem);
+        }
+
+        if(texto != undefined){
+            return this.consultarPostagem(undefined, texto);
+        }
+    }
+    
+}
 
 export { Perfil, Postagem, PostagemAvancada, RepositorioDePerfis, RepositorioDePostagens }
