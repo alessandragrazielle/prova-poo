@@ -18,8 +18,8 @@ class App {
         do {
             console.log('\nBem Vindo \nDigite uma opção: ');
             console.log('1 - Consultar Perfil    2 - Incluir Perfil      3 - Consultar Postagem\n' +
-                        '4 - Incluir Postagem    5 - Avaliar Postagens   6 - Exibir Perfis \n' +
-                        '7 - Exibir todas as postagens \n' +
+                        '4 - Incluir Postagem    5 - Avaliar Postagens   6 - Exibir Todos os Perfis \n' +
+                        '7 - Exibir Todas as Postagens \n' +
                         '0 - Sair\n');
 
             opcao = input("Opção: ");
@@ -58,7 +58,8 @@ class App {
     consultarPerfil(): void {
         console.log('\nCONSULTAR PERFIL');
         let nomePerfil = input('Nome do perfil procurado: ');
-        this.redeSocial.consultarPerfil(undefined, nomePerfil);
+        let perfil = this.redeSocial.consultarPerfil(undefined, nomePerfil);
+        console.log(perfil);
     }
 
     incluirPerfil(): void {
@@ -107,10 +108,9 @@ class App {
     consultarPorTexto(){
         console.log('\nCONSULTAR POSTAGEM POR TEXTO');
         let texto: string = input('Texto da postagem: ');
-        let postagens = this.redeSocial.consultarPostagem(undefined, texto);
+        let postagem = this.redeSocial.exibirPorPostagem(undefined, texto);
 
-        console.log(postagens);
-        
+        console.log(postagem);
     }
 
     consultarPorHashtag(){
@@ -134,7 +134,9 @@ class App {
         console.log('\nCONSULTAR POSTAGEM POR ID');
         let idPostagemStr: string = input('Id da postagem: ');
         let idPostagem: number = parseFloat(idPostagemStr)
-        this.redeSocial.consultarPostagem(idPostagem);
+        let postagem = this.redeSocial.exibirPorPostagem(idPostagem);
+
+        console.log(postagem);
     }
 
     incluirPostagem(): void {
