@@ -41,24 +41,7 @@ class RedeSocial {
     }
 
     exibirPostagensPorHashtag(hashtag: string): PostagemAvancada[] {
-        let postagensFiltradas: PostagemAvancada [] = [];
-        
-        let result = this._repositorioDePostagens.consultarPostagem(undefined, undefined, hashtag, undefined);//como instanciar ????????
-
-        if (typeof result === 'string') {
-            console.log(result);
-            return postagensFiltradas;
-        }
-
-        for(let postagem of result){
-            if (postagem instanceof PostagemAvancada && postagem.existeHashtag(hashtag)){
-                if (postagem.visualizacoesRestantes > 0){
-                    postagensFiltradas.push(postagem);
-                    postagem.decrementarVisualizacoes();
-                }
-            }
-        }
-        return postagensFiltradas;
+        return this.respositorioDePostagens.exibirPostagensPorHashtag(hashtag);
     }
 
     exibirPostagensPorPerfil(id: number): Postagem[]{
@@ -71,6 +54,10 @@ class RedeSocial {
 
     exibirPerfis(): string{
         return this.repositorioDePerfis.exibirTodosOsPerfis();
+    }
+
+    exibirPorPostagem(idPostagem?: number, texto?: string){
+        return this.respositorioDePostagens.exibirPorPostagem(idPostagem, texto);
     }
 }
 
