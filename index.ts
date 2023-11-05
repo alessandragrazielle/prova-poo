@@ -82,7 +82,7 @@ class Postagem{
 class PostagemAvancada extends Postagem{
     private _hashtags: string[] = [];
     private _visualizacoesRestantes: number = 1000;
-    constructor(i:number, t:string, c:number, d:number, dt:Date, p:Perfil){
+    constructor(i:number, t:string, /*c:number, d:number, dt:Date,*/ p:Perfil){
         super(i, t, /*c, d, dt,*/ p);
     }
 
@@ -128,7 +128,7 @@ class RepositorioDePerfis {
     private _perfis: Perfil[] = [];
 
     consultarPerfil(id?: number, nome?: string, email?: string): Perfil{ // resolver o problema do undefined
-        let perfilProcurado!: Perfil;
+        let perfilProcurado!: Perfil ;
 
         for(let p of this._perfis){
             if((id == undefined || p.idPerfil == id) &&
@@ -136,7 +136,7 @@ class RepositorioDePerfis {
                 (email == undefined || p.email == email)){
                     perfilProcurado = p
             }
-        }
+        } 
 
         return perfilProcurado;
     }
@@ -209,77 +209,19 @@ class RepositorioDePostagens {
         postagem.perfil.postagensDoPerfil.push(postagem);
         return'Postagem incluída com sucesso!';
     }  
+
+    exibirPostagem(texto: string): string{
+        let postagens: string = '';
+        for(let p of this._postagens){
+            if(texto == p.texto){
+                postagens += `Texto: ${p.texto}
+                              Perfil: ${p.perfil}`
+            }
+        }
+
+        return postagens;
+    }
 }
 
 
 export { Perfil, Postagem, PostagemAvancada, RepositorioDePerfis, RepositorioDePostagens }
-
-
-
-// instanciando
-//Perfis
-let perfil1: Perfil = new Perfil(1, 'alessandra', 'ale@gmail.com')
-let perfil2: Perfil = new Perfil(2, 'kaylanne', 'k@gmail.com')
-let perfil3: Perfil = new Perfil(3, 'kaylanne santos', 'k@gmail.com') // n inclui
-let perfil4: Perfil = new Perfil(3, 'kaylanne santossss', 'kay@gmail.com') 
-let perfil5: Perfil = new Perfil(4, 'maria', 'm@gmail.com')
-
-// Repositorio de perfis
-let rperfil: RepositorioDePerfis = new RepositorioDePerfis();
-rperfil.incluirPerfil(perfil1);
-rperfil.incluirPerfil(perfil2);
-rperfil.incluirPerfil(perfil3);
-rperfil.incluirPerfil(perfil4);
-rperfil.incluirPerfil(perfil5);
-
-console.log('------------------------------------------------------');
-console.log('PERFIS NO REPOSITORIO');
-console.log(rperfil);
-
-
-//console.log(rperfil.consultarPerfil(undefined,'maria',undefined));
-
-//Postagens
-let postagem1: Postagem = new Postagem(1, 'texto', perfil1);
-let postagem2: Postagem = new Postagem(2, 'textoo', perfil2);
-let postagem3: Postagem = new Postagem(3, 'textoooo',  perfil3);
-let postagem4: Postagem = new Postagem(4, 'textoooo', perfil4);
-
-//Postagens Avancadas
-let postagemA1: PostagemAvancada = new PostagemAvancada(1, 'texto', 8, 5, new Date(), perfil1);
-let postagemA2: PostagemAvancada = new PostagemAvancada(2, 'textoo', 7, 4, new Date(), perfil2);
-
-// Adicionando hashtags
-postagemA1.adicionarHashtag('#instagram')
-postagemA1.adicionarHashtag('#post')
-postagemA2.adicionarHashtag('#post')
-postagemA2.adicionarHashtag('#vida')
-
-console.log('------------------------------------------------------');
-console.log('HASHTAGS');
-console.log(postagemA1.hashtags);
-console.log(postagemA2.hashtags);
-
-console.log('------------------------------------------------------');
-console.log('TEM HASHTAG?');
-console.log(postagemA1.existeHashtag('#post'));
-console.log(postagemA2.existeHashtag('#post'));
-console.log(postagemA1.existeHashtag('#vida'));
-console.log(postagemA2.existeHashtag('#vida'));
-
-//console.log(rpostagem.consultarPostagem(undefined,undefined,undefined,perfil4));
-
-console.log('------------------------------------------------------');
-let rpostagem: RepositorioDePostagens = new RepositorioDePostagens();
-
-//console.log(rpostagem._postagens);
-rpostagem.incluirPostagem(postagem1)
-rpostagem.incluirPostagem(postagem2)
-rpostagem.incluirPostagem(postagem3)
-rpostagem.incluirPostagem(postagem4)
-rpostagem.incluirPostagem(postagemA1)
-rpostagem.incluirPostagem(postagemA2)
-console.log(rpostagem.consultarPostagem(undefined, undefined, '#post'))
-
-//postagem1.descurtir()
-//console.log(postagem1.ehPopular());
