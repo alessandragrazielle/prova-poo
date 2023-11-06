@@ -1,8 +1,8 @@
-import prompt from "prompt-sync";
+import prompt from 'prompt-sync';
 let input = prompt();
 
 import { RedeSocial } from "./redeSocial";
-import { Perfil, Postagem, PostagemAvancada, RepositorioDePerfis, RepositorioDePostagens } from "./index";
+import { Perfil, Postagem, PostagemAvancada } from "./index";
 
 class App {
     private _redeSocial: RedeSocial = new RedeSocial;
@@ -19,8 +19,9 @@ class App {
             console.log('\nBEM VINDO AO APP \nDigite uma opção: ');
             console.log('1 - Consultar Perfil    2 - Incluir Perfil      3 - Consultar Postagem\n' +
                         '4 - Incluir Postagem    5 - Avaliar Postagens   6 - Exibir Postagens Populares \n' +
-                        '7 - Exibir Todos os Perfis        8 - Exibir Todas as Postagens \n' +
-                        '0 - Sair\n');
+                        '7 - Exibir Todos os Perfis        8 - Exibir Todas as Postagens       9 - Excluir Postagem\n' +
+                        '10 - Editar Perfil \n' +
+                        '0 - Sair \n');
 
             opcao = input("Opção: ");
             
@@ -49,6 +50,12 @@ class App {
                 case "8":
                     this.exibirTodasPostagens();
                     break;
+                case "9": 
+                    this.excluirPostagem();
+                    break;
+                case"10":
+                    this.editarPerfil();
+                    break
                 case "0": console.log('Aplicação encerrada!');
                     break;
                 default:
@@ -268,6 +275,30 @@ class App {
     postagensPopulares(): void{
         console.log('POSTAGENS POPULARES');
         console.log(this.redeSocial.postagensPopulares())
+    }
+
+    excluirPostagem(): void{
+        console.log('EXCLUIR POSTAGEM');
+        let idStr = input('Id da postagem que deseja excluir: ')
+        let id: number = parseFloat(idStr)
+        this.redeSocial.excluirPostagem(id)
+    }
+
+    editarPerfil(): void{
+        console.log('EDITAR PERFIL');
+        let op = input('Deseja editar o nome ou o email? (n/e) ')
+
+        if(op == 'n'){
+            let nomeA = input('Antigo Nome: ')
+            let nomeN = input('Novo Nome: ')
+            this.redeSocial.editarNome(nomeA, nomeN)
+        } else if(op == 'e'){
+            let emailA = input('Antigo Email: ')
+            let emailN = input('Novo Email: ')
+            this.redeSocial.editarEmail(emailA, emailN)
+        } else {
+            console.log('Opção inválida');
+        }        
     }
 }
 
