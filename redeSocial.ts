@@ -63,6 +63,17 @@ class RedeSocial {
     postagensPopulares(){
         return this.respositorioDePostagens.postagensPopulares()
     }
-}
 
+    excluirPostagem(idPostagem: number){
+        return this.respositorioDePostagens.excluirPostagem(idPostagem)
+    }
+
+    editarNome(antigoNome: string, nomeNovo: string){
+        return this.repositorioDePerfis.editarNome(antigoNome, nomeNovo)
+    }
+
+    editarEmail(antigoEmail: string, emailNovo: string){
+        return this.repositorioDePerfis.editarEmail(antigoEmail, emailNovo)
+    }
+}
 export{ RedeSocial };
