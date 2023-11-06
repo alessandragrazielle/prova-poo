@@ -16,10 +16,10 @@ class App {
     menu(): void {
         let opcao: string = '';
         do {
-            console.log('\nBem Vindo \nDigite uma opção: ');
+            console.log('\nBEM VINDO AO APP \nDigite uma opção: ');
             console.log('1 - Consultar Perfil    2 - Incluir Perfil      3 - Consultar Postagem\n' +
-                        '4 - Incluir Postagem    5 - Avaliar Postagens   6 - Exibir Todos os Perfis \n' +
-                        '7 - Exibir Todas as Postagens \n' +
+                        '4 - Incluir Postagem    5 - Avaliar Postagens   6 - Exibir Postagens Populares \n' +
+                        '7 - Exibir Todos os Perfis        8 - Exibir Todas as Postagens \n' +
                         '0 - Sair\n');
 
             opcao = input("Opção: ");
@@ -41,9 +41,12 @@ class App {
                     this.avaliarPostagem();
                     break;
                 case "6":
-                    this.exibirPerfis();
+                    this.postagensPopulares();
                     break;
                 case "7":
+                    this.exibirPerfis();
+                    break;
+                case "8":
                     this.exibirTodasPostagens();
                     break;
                 case "0": console.log('Aplicação encerrada!');
@@ -258,8 +261,13 @@ class App {
     }
 
     exibirTodasPostagens(): void{
-        console.log('TODOS AS POSTAGENS');
+        console.log('TODAS AS POSTAGENS');
         console.log(this.redeSocial.exibirTodasAsPostagens())
+    }
+
+    postagensPopulares(): void{
+        console.log('POSTAGENS POPULARES');
+        console.log(this.redeSocial.postagensPopulares())
     }
 }
 
