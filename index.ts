@@ -368,6 +368,28 @@ class RepositorioDePostagens {
             return this.consultarPostagem(undefined, texto);
         }
     }
+
+    postagensPopulares(): Postagem[]{
+        let postagens!: Postagem[]
+
+        for(let p of this._postagens){
+            if(p.ehPopular()){
+                postagens.push(p)
+            }
+        }
+
+        try{
+            if(postagens.length == 0){
+                throw new PostagemNaoEncontradaError('Não há postagens populares')
+            }
+        } catch(e: any) {
+            if (e instanceof AplicacaoError) {
+                console.log(e.message);
+            }
+        }
+
+        return postagens;
+    }
     
 }
 
