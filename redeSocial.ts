@@ -59,6 +59,10 @@ class RedeSocial {
     exibirPorPostagem(idPostagem?: number, texto?: string){
         return this.respositorioDePostagens.exibirPorPostagem(idPostagem, texto);
     }
+
+    postagensPopulares(){
+        return this.respositorioDePostagens.postagensPopulares()
+    }
 }
 
 export{ RedeSocial };
