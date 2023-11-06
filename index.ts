@@ -26,6 +26,14 @@ class Perfil{
     get postagensDoPerfil(): Postagem[] {
         return this._postagensDoPerfil;
     }
+
+    set nome(nome: string){
+        this._nome = nome
+    }
+
+    set email(email: string){
+        this._email = email;
+    }
 }
 
 class Postagem{
@@ -80,7 +88,7 @@ class Postagem{
 
 class PostagemAvancada extends Postagem{
     private _hashtags: string[] = [];
-    private _visualizacoesRestantes: number = 1000;
+    private _visualizacoesRestantes: number = 1;
     constructor(i:number, t:string, p:Perfil){
         super(i, t, p);
     }
@@ -210,6 +218,35 @@ class RepositorioDePerfis {
         }
     }
 
+    editarNome(antigoNome: string, nomeNovo: string){
+        try{
+            let perfil = this.consultarPerfil(undefined, antigoNome);
+            perfil.nome = nomeNovo
+
+            if(!perfil){
+                throw new PerfilNaoEncontradoError('Perfil não encontrado!');
+            }
+        } catch (e:any){
+            if(e instanceof AplicacaoError){
+                console.log(e.message);
+            }
+        }
+    }
+
+    editarEmail(antigoEmail: string, emailNovo: string){
+        try{
+            let perfil = this.consultarPerfil(undefined, undefined, antigoEmail);
+            perfil.email = emailNovo
+            if(!perfil){
+                throw new PerfilNaoEncontradoError('Perfil não encontrado!');
+            }
+        } catch (e:any){
+            if(e instanceof AplicacaoError){
+                console.log(e.message);
+            }
+        }
+    }
+    
 }
 
 class RepositorioDePostagens {
@@ -264,6 +301,28 @@ class RepositorioDePostagens {
 
         return postagemProcurada;
     }
+
+    private consultarPorIndice(id:number){
+        let indiceProcurado: number = -1;
+        try{
+            for(let i = 0; i < this._postagens.length; i++){
+                if(this._postagens[i].idPostagem == id){
+                    indiceProcurado = i;
+                }
+            }
+
+            if(indiceProcurado == -1){
+                throw new PostagemNaoEncontradaError('Essa postagem não exite!')
+            }
+        } catch(e: any){
+            if (e instanceof AplicacaoError){
+                console.log(e.message);
+            }
+        }
+
+        return indiceProcurado;
+    }
+
 
     incluirPostagem(postagem: Postagem){
         try{
@@ -352,7 +411,7 @@ class RepositorioDePostagens {
     }
 
 
-    exibirPorPostagem(idPostagem?: number, texto?: string){ // criada exibição por postagem
+    exibirPorPostagem(idPostagem?: number, texto?: string){ 
         let postagemProcurada = this.consultarPostagem(idPostagem);
         if(postagemProcurada instanceof PostagemAvancada){
             if (postagemProcurada.visualizacoesRestantes > 0){
@@ -370,16 +429,16 @@ class RepositorioDePostagens {
     }
 
     postagensPopulares(): Postagem[]{
-        let postagens!: Postagem[]
+        let postagensPopulares: Postagem[] = []
 
         for(let p of this._postagens){
             if(p.ehPopular()){
-                postagens.push(p)
+                postagensPopulares.push(p)
             }
         }
 
         try{
-            if(postagens.length == 0){
+            if(postagensPopulares.length == 0){
                 throw new PostagemNaoEncontradaError('Não há postagens populares')
             }
         } catch(e: any) {
@@ -388,7 +447,15 @@ class RepositorioDePostagens {
             }
         }
 
-        return postagens;
+        return postagensPopulares;
+    }
+
+    excluirPostagem(idPostagem: number){
+        let indice: number = this.consultarPorIndice(idPostagem);
+        for(let i = indice; i < this._postagens.length; i++){
+            this._postagens[i] = this._postagens[i+1];
+        }
+        this._postagens.pop()
     }
     
 }
