@@ -1,4 +1,5 @@
 import { Perfil, Postagem, PostagemAvancada, RepositorioDePerfis, RepositorioDePostagens } from "./index";
+import { AplicacaoError, AtributoVazioError, PerfilExistenteError, PerfilNaoEncontradoError, PostagemJaExisteError, PostagemNaoEncontradaError } from "./excecoes";
 
 class RedeSocial {
     private _repositorioDePerfis: RepositorioDePerfis = new RepositorioDePerfis();
@@ -27,13 +28,20 @@ class RedeSocial {
     consultarPostagem(id?: number | undefined, texto?: string | undefined, hashtag?: string | undefined, perfil?:  Perfil | undefined): Postagem[]{
         return this._repositorioDePostagens.consultarPostagem(id, texto, hashtag, perfil);
     }
+    
 
     curtir(idPost: number): void {
-        this.respositorioDePostagens.curtir(idPost)
+        let postagemProcurada = this._repositorioDePostagens.consultarPostagemPorId(idPost)
+        if (postagemProcurada.idPostagem == idPost) {
+            postagemProcurada.curtir();     
+        }
     }
 
     descurtir(idPost: number): void {
-        this.respositorioDePostagens.descurtir(idPost)
+        let postagemProcurada = this._repositorioDePostagens.consultarPostagemPorId(idPost)
+        if (postagemProcurada.idPostagem == idPost) {
+            postagemProcurada.descurtir();     
+        }
     }
 
     decrementar(postagem: PostagemAvancada): void {
@@ -41,39 +49,169 @@ class RedeSocial {
     }
 
     exibirPostagensPorHashtag(hashtag: string): PostagemAvancada[] {
-        return this.respositorioDePostagens.exibirPostagensPorHashtag(hashtag);
+        let postagensFiltradas: PostagemAvancada [] = [];
+        
+        let result = this.consultarPostagem(undefined, undefined, hashtag, undefined);
+
+        if (typeof result === 'string') {
+            console.log(result);
+            return postagensFiltradas;
+        }
+
+        for(let postagem of result){
+            if (postagem instanceof PostagemAvancada && postagem.existeHashtag(hashtag)){
+                if (postagem.visualizacoesRestantes > 0){
+                    postagensFiltradas.push(postagem);
+                    postagem.decrementarVisualizacoes();
+                }
+            }
+        }
+        return postagensFiltradas;
     }
 
     exibirPostagensPorPerfil(id: number): Postagem[]{
-        return this.repositorioDePerfis.exibirPostagensPorPerfil(id)
+        let postagensFiltradas: Postagem[] = [];
+        let perfilProcurado = this.consultarPerfil(id);
+
+        for(let postagem of perfilProcurado.postagensDoPerfil){
+            if (postagem instanceof PostagemAvancada){
+                if (postagem.visualizacoesRestantes > 0){
+                    postagensFiltradas.push(postagem);
+                    postagem.decrementarVisualizacoes();
+                }
+            } else {
+                postagensFiltradas.push(postagem);
+            }
+        }
+
+        return postagensFiltradas;
     }
 
-    exibirTodasAsPostagens(): string{
-        return this.respositorioDePostagens.exibirTodasPostagens()
-    }
+    /*exibirTodasAsPostagens(): string{
+        let postagens: string = '';
+
+        for(let p of this._repositorioDePostagens){
+            if(p instanceof PostagemAvancada){
+                postagens += `
+                Id: ${p.idPostagem}
+                Texto: ${p.texto}
+                Curtidas: ${p.curtidas}
+                Descurtidas: ${p.descurtidas}
+                Hashtags: ${p.hashtags}
+                Vizualizações: ${p.quantidadeDeVizualizaoes()}
+                `
+                if (p.visualizacoesRestantes > 0){
+                    p.decrementarVisualizacoes();
+                }
+            } else {
+                postagens += `
+                Id: ${p.idPostagem}
+                Texto: ${p.texto}
+                Curtidas: ${p.curtidas}
+                Descurtidas: ${p.descurtidas}
+                `
+            }
+        }
+
+        return postagens;
+    }*/
 
     exibirPerfis(): string{
-        return this.repositorioDePerfis.exibirTodosOsPerfis();
+        let perfis: string = '';
+
+        for(let p of this._perfis){
+            perfis += `
+            Id: ${p.idPerfil}
+            Nome: ${p.nome}
+            Email: ${p.email}
+            `
+        }
+
+        return perfis;
+    } 
+
+    exibirPerfil(idPerfil: number){ // criado exibição por perfil
+        let perfilProcurado = this.consultarPerfil(idPerfil);
+
+        if(perfilProcurado.idPerfil == idPerfil){
+            return `Id: ${perfilProcurado.idPerfil},\nUsuário: ${perfilProcurado.nome},\nEmail: ${perfilProcurado.email}.`;
+        }
+    } 
+
+    exibirPorPostagem(idPostagem?: number, texto?: string){ 
+        let postagemProcurada = this.consultarPostagem(idPostagem);
+        if(postagemProcurada instanceof PostagemAvancada){
+            if (postagemProcurada.visualizacoesRestantes > 0){
+                postagemProcurada.decrementarVisualizacoes();
+            }
+        }
+
+        if(idPostagem != undefined){
+            return this.consultarPostagem(idPostagem);
+        }
+
+        if(texto != undefined){
+            return this.consultarPostagem(undefined, texto);
+        }
     }
 
-    exibirPorPostagem(idPostagem?: number, texto?: string){
-        return this.respositorioDePostagens.exibirPorPostagem(idPostagem, texto);
-    }
+    postagensPopulares(): Postagem[]{
+        let postagensPopulares: Postagem[] = []
 
-    postagensPopulares(){
-        return this.respositorioDePostagens.postagensPopulares()
+        for(let p of this._postagens){
+            if(p.ehPopular()){
+                postagensPopulares.push(p)
+            }
+        }
+
+        try{
+            if(postagensPopulares.length == 0){
+                throw new PostagemNaoEncontradaError('Não há postagens populares')
+            }
+        } catch(e: any) {
+            if (e instanceof AplicacaoError) {
+                console.log(e.message);
+            }
+        }
+
+        return postagensPopulares;
     }
 
     excluirPostagem(idPostagem: number){
-        return this.respositorioDePostagens.excluirPostagem(idPostagem)
+        let indice: number = this._repositorioDePostagens.consultarPorIndice(idPostagem);
+        for(let i = indice; i < this._postagens.length; i++){
+            this._postagens[i] = this._postagens[i+1];
+        }
+        this._postagens.pop()
     }
 
     editarNome(antigoNome: string, nomeNovo: string){
-        return this.repositorioDePerfis.editarNome(antigoNome, nomeNovo)
+        try{
+            let perfil = this.consultarPerfil(undefined, antigoNome);
+            perfil.nome = nomeNovo
+
+            if(!perfil){
+                throw new PerfilNaoEncontradoError('Perfil não encontrado!');
+            }
+        } catch (e:any){
+            if(e instanceof AplicacaoError){
+                console.log(e.message);
+            }
+        }
     }
 
     editarEmail(antigoEmail: string, emailNovo: string){
-        return this.repositorioDePerfis.editarEmail(antigoEmail, emailNovo)
+        try{
+            let perfil = this.consultarPerfil(undefined, undefined, antigoEmail);
+            perfil.email = emailNovo
+            if(!perfil){
+                throw new PerfilNaoEncontradoError('Perfil não encontrado!');
+            }
+        } catch (e:any){
+            if(e instanceof AplicacaoError){
+                console.log(e.message);
+            }
+        }
     }
 }
 export{ RedeSocial };
